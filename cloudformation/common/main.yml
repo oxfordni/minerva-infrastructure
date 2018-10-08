@@ -55,6 +55,13 @@ Resources:
         - Key: project
           Value: !Ref ProjectTag
 
+  CodiBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: project
+          Value: !Ref ProjectTag
+
   GeneralSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -143,7 +150,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+              AWS: arn:aws:iam::292075781285:root
             Action: sts:AssumeRole
       Policies:
         - PolicyName: !Sub ${StackPrefix}-${Stage}-AssumedS3RoleReadPolicy
@@ -171,7 +178,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+              AWS: arn:aws:iam::292075781285:root
             Action: sts:AssumeRole
       Policies:
         - PolicyName: !Sub ${StackPrefix}-${Stage}-AssumedS3RoleWritePolicy
@@ -217,6 +224,14 @@ Resources:
       Description: S3 Bucket ARN for tile data
       Type: String
       Value: !GetAtt TileBucket.Arn
+  
+  S3BucketCodiARN:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${StackPrefix}/${Stage}/common/S3BucketCodiARN
+      Description: S3 Bucket ARN for codi data
+      Type: String
+      Value: !GetAtt CodiBucket.Arn      
 
   GeneralSGID:
     Type: AWS::SSM::Parameter
@@ -298,6 +313,13 @@ Outputs:
     Value: !GetAtt TileBucket.Arn
     Export:
       Name: !Sub ${StackPrefix}-${Stage}-S3BucketTileARN
+
+  S3BucketCodiARN:
+    Description: S3 Bucket ARN for codi data
+    Value: !GetAtt CodiBucket.Arn
+    Export:
+      Name: !Sub ${StackPrefix}-${Stage}-S3BucketCodiARN
+
   GeneralSGID:
     Description: General Security Group ID
     Value: !GetAtt GeneralSG.GroupId
